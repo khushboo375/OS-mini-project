@@ -1,4 +1,5 @@
 #include<stdio.h>
+Hii sohann 
 //accept no of process and its size
 typedef struct
 {
