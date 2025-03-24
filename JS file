@@ -32,12 +32,8 @@ function generateTables() {
     }
 }
 
-let maxMatrix = [];
-let allocMatrix = [];
-let initialAvailable = [];
-let available = [];
-let needMatrix = [];
-let processes = [];
+let maxMatrix = [], allocMatrix = [], needMatrix = [];
+let initialAvailable = [], available = [], processes = [];
 
 function processInput() {
     maxMatrix = getMatrixValues("max-matrix");
@@ -45,10 +41,7 @@ function processInput() {
     let numProcesses = parseInt(document.getElementById("num-processes").value);
     let numResources = parseInt(document.getElementById("num-resources").value);
 
-    processes = []; // Reset processes
-    for (let i = 0; i < numProcesses; i++) {
-        processes.push("P" + i);
-    }
+    processes = Array.from({ length: numProcesses }, (_, i) => "P" + i);
 
     initialAvailable = [];
     for (let j = 0; j < numResources; j++) {
@@ -57,11 +50,11 @@ function processInput() {
 
     available = [...initialAvailable];
     for (let j = 0; j < available.length; j++) {
-        let allocatedSum = allocMatrix.reduce((sum, row) => sum + row[j], 0);
-        available[j] -= allocatedSum;
+        available[j] -= allocMatrix.reduce((sum, row) => sum + row[j], 0);
     }
 
     needMatrix = maxMatrix.map((row, i) => row.map((maxVal, j) => maxVal - allocMatrix[i][j]));
+
     displayNeedMatrix();
     updateAvailableResources();
 }
@@ -69,17 +62,11 @@ function processInput() {
 function getMatrixValues(tableId) {
     let table = document.getElementById(tableId);
     let rows = table.getElementsByTagName("tr");
-    let matrix = [];
-
-    for (let i = 1; i < rows.length; i++) {
-        let cells = rows[i].getElementsByTagName("td");
-        let rowValues = [];
-        for (let j = 1; j < cells.length; j++) {
-            rowValues.push(parseInt(cells[j].getElementsByTagName("input")[0].value));
-        }
-        matrix.push(rowValues);
-    }
-    return matrix;
+    return Array.from(rows).slice(1).map(row =>
+        Array.from(row.getElementsByTagName("td")).slice(1).map(cell =>
+            parseInt(cell.getElementsByTagName("input")[0].value)
+        )
+    );
 }
 
 function displayNeedMatrix() {
@@ -93,46 +80,99 @@ function displayNeedMatrix() {
 }
 
 function updateAvailableResources() {
-    document.getElementById("available-resources").innerText = available.join(" | ");
+    document.getElementById("available-resources").innerHTML = "Available Resources: " + available.join(", ");
 }
 
-// Simulating Banker's Algorithm
 function startSimulation() {
     let checkingQueue = document.getElementById("checking");
     let safeSequenceQueue = document.getElementById("safe-sequence");
     let blockedQueue = document.getElementById("blocked");
 
-    checkingQueue.innerHTML = "Checking Process:";
-    safeSequenceQueue.innerHTML = "Safe Sequence:";
-    blockedQueue.innerHTML = "Blocked Processes:";
+    checkingQueue.innerHTML = "Checking Process: ";
+    safeSequenceQueue.innerHTML = "Safe Sequence: ";
+    blockedQueue.innerHTML = "Blocked Processes: ";
 
     let finish = new Array(processes.length).fill(false);
     let safeSequence = [];
     let work = [...available];
+    let blockedProcesses = [];
 
-    function executeProcess(i) {
-        if (i >= processes.length) return;
-        let proc = "P" + i;
+    function checkProcess(index) {
+        if (finish[index]) return;
+
+        let proc = "P" + index;
         let checkingDiv = document.createElement("span");
         checkingDiv.textContent = proc;
         checkingQueue.appendChild(checkingDiv);
 
+        let needCells = document.querySelectorAll(`#need-matrix tbody tr:nth-child(${index + 1}) td`);
+        let canExecute = needMatrix[index].every((val, j) => {
+            needCells[j + 1].style.backgroundColor = val <= work[j] ? "green" : "red";
+            return val <= work[j];
+        });
+
         setTimeout(() => {
-            let canExecute = needMatrix[i].every((val, j) => val <= work[j]);
+            checkingQueue.removeChild(checkingDiv);
 
             if (canExecute) {
-                work = work.map((val, j) => val + allocMatrix[i][j]);
-                available = [...work]; // Update available resources
+                work = work.map((val, j) => val + allocMatrix[index][j]);
+                available = [...work];
                 updateAvailableResources();
-                checkingQueue.removeChild(checkingDiv);
-                safeSequenceQueue.appendChild(checkingDiv);
+
+                let successDiv = document.createElement("span");
+                successDiv.textContent = proc + " ";
+                safeSequenceQueue.appendChild(successDiv);
+
+                finish[index] = true;
+
+                let blockedIndex = blockedProcesses.indexOf(index);
+                if (blockedIndex !== -1) blockedProcesses.splice(blockedIndex, 1);
+
+                recheckBlockedProcesses();
             } else {
-                checkingQueue.removeChild(checkingDiv);
-                blockedQueue.appendChild(checkingDiv);
+                if (!blockedProcesses.includes(index)) {
+                    let blockDiv = document.createElement("span");
+                    blockDiv.textContent = proc + " ";
+                    blockedQueue.appendChild(blockDiv);
+                    blockedProcesses.push(index);
+                }
+                setTimeout(recheckBlockedProcesses, 1000);
             }
-            executeProcess(i + 1);
-        }, 2000);
+        }, 1000);
     }
 
-    executeProcess(0);
+    function recheckBlockedProcesses() {
+        let rechecked = false;
+        for (let i = 0; i < blockedProcesses.length; i++) {
+            let index = blockedProcesses[i];
+            if (needMatrix[index].every((val, j) => val <= work[j])) {
+                blockedProcesses.splice(i, 1);
+                checkProcess(index);
+                rechecked = true;
+                break;
+            }
+        }
+
+        if (!rechecked) {
+            for (let i = 0; i < processes.length; i++) {
+                if (!finish[i]) {
+                    checkProcess(i);
+                    return;
+                }
+            }
+
+            if (finish.every(val => val)) {
+                alert("Simulation complete! Safe sequence: " + safeSequenceQueue.innerText);
+            }
+        }
+    }
+
+    function startNextProcess(index) {
+        if (index < processes.length) {
+            checkProcess(index);
+            setTimeout(() => startNextProcess(index + 1), 1500);
+        }
+    }
+
+    startNextProcess(0);
 }
