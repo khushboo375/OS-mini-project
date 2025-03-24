@@ -1,0 +1,138 @@
+function generateTables() {
+    let numProcesses = parseInt(document.getElementById("num-processes").value);
+    let numResources = parseInt(document.getElementById("num-resources").value);
+
+    let tablesContainer = document.getElementById("tables-container");
+    tablesContainer.innerHTML = "";
+
+    let tableNames = ["Max Matrix", "Allocated Matrix"];
+    let tableIds = ["max-matrix", "alloc-matrix"];
+
+    tableNames.forEach((name, index) => {
+        let tableHTML = `<h3>${name}</h3><table id="${tableIds[index]}"><thead><tr><th>Process</th>`;
+        for (let j = 0; j < numResources; j++) {
+            tableHTML += `<th>R${j}</th>`;
+        }
+        tableHTML += `</tr></thead><tbody>`;
+
+        for (let i = 0; i < numProcesses; i++) {
+            tableHTML += `<tr><td>P${i}</td>`;
+            for (let j = 0; j < numResources; j++) {
+                tableHTML += `<td><input type="number" min="0" value="0"></td>`;
+            }
+            tableHTML += `</tr>`;
+        }
+        tableHTML += `</tbody></table>`;
+        tablesContainer.innerHTML += tableHTML;
+    });
+
+    tablesContainer.innerHTML += `<h3>Initial Available Resources</h3>`;
+    for (let j = 0; j < numResources; j++) {
+        tablesContainer.innerHTML += `<input type="number" id="initial-resource-${j}" min="0" value="5"> `;
+    }
+}
+
+let maxMatrix = [];
+let allocMatrix = [];
+let initialAvailable = [];
+let available = [];
+let needMatrix = [];
+let processes = [];
+
+function processInput() {
+    maxMatrix = getMatrixValues("max-matrix");
+    allocMatrix = getMatrixValues("alloc-matrix");
+    let numProcesses = parseInt(document.getElementById("num-processes").value);
+    let numResources = parseInt(document.getElementById("num-resources").value);
+
+    processes = []; // Reset processes
+    for (let i = 0; i < numProcesses; i++) {
+        processes.push("P" + i);
+    }
+
+    initialAvailable = [];
+    for (let j = 0; j < numResources; j++) {
+        initialAvailable.push(parseInt(document.getElementById(`initial-resource-${j}`).value));
+    }
+
+    available = [...initialAvailable];
+    for (let j = 0; j < available.length; j++) {
+        let allocatedSum = allocMatrix.reduce((sum, row) => sum + row[j], 0);
+        available[j] -= allocatedSum;
+    }
+
+    needMatrix = maxMatrix.map((row, i) => row.map((maxVal, j) => maxVal - allocMatrix[i][j]));
+    displayNeedMatrix();
+    updateAvailableResources();
+}
+
+function getMatrixValues(tableId) {
+    let table = document.getElementById(tableId);
+    let rows = table.getElementsByTagName("tr");
+    let matrix = [];
+
+    for (let i = 1; i < rows.length; i++) {
+        let cells = rows[i].getElementsByTagName("td");
+        let rowValues = [];
+        for (let j = 1; j < cells.length; j++) {
+            rowValues.push(parseInt(cells[j].getElementsByTagName("input")[0].value));
+        }
+        matrix.push(rowValues);
+    }
+    return matrix;
+}
+
+function displayNeedMatrix() {
+    let tbody = document.querySelector("#need-matrix tbody");
+    tbody.innerHTML = "";
+    needMatrix.forEach((row, i) => {
+        let tr = document.createElement("tr");
+        tr.innerHTML = `<td>P${i}</td>` + row.map(val => `<td>${val}</td>`).join("");
+        tbody.appendChild(tr);
+    });
+}
+
+function updateAvailableResources() {
+    document.getElementById("available-resources").innerText = available.join(" | ");
+}
+
+// Simulating Banker's Algorithm
+function startSimulation() {
+    let checkingQueue = document.getElementById("checking");
+    let safeSequenceQueue = document.getElementById("safe-sequence");
+    let blockedQueue = document.getElementById("blocked");
+
+    checkingQueue.innerHTML = "Checking Process:";
+    safeSequenceQueue.innerHTML = "Safe Sequence:";
+    blockedQueue.innerHTML = "Blocked Processes:";
+
+    let finish = new Array(processes.length).fill(false);
+    let safeSequence = [];
+    let work = [...available];
+
+    function executeProcess(i) {
+        if (i >= processes.length) return;
+        let proc = "P" + i;
+        let checkingDiv = document.createElement("span");
+        checkingDiv.textContent = proc;
+        checkingQueue.appendChild(checkingDiv);
+
+        setTimeout(() => {
+            let canExecute = needMatrix[i].every((val, j) => val <= work[j]);
+
+            if (canExecute) {
+                work = work.map((val, j) => val + allocMatrix[i][j]);
+                available = [...work]; // Update available resources
+                updateAvailableResources();
+                checkingQueue.removeChild(checkingDiv);
+                safeSequenceQueue.appendChild(checkingDiv);
+            } else {
+                checkingQueue.removeChild(checkingDiv);
+                blockedQueue.appendChild(checkingDiv);
+            }
+            executeProcess(i + 1);
+        }, 2000);
+    }
+
+    executeProcess(0);
+}
