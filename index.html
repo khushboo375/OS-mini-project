@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Banker's Algorithm Simulator</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .matrix-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 320px;
+            transition: transform 0.3s ease;
+        }
+
+        .matrix-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .setup-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        h3 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 8px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52,152,219,0.3);
+            outline: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 15px 0;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .safe {
+            background-color: #d4edda;
+            animation: safePulse 2s infinite;
+        }
+
+        .wait {
+            background-color: #f8d7da;
+            animation: waitPulse 2s infinite;
+        }
+
+        @keyframes safePulse {
+            0% { background-color: #d4edda; }
+            50% { background-color: #c3e6cb; }
+            100% { background-color: #d4edda; }
+        }
+
+        @keyframes waitPulse {
+            0% { background-color: #f8d7da; }
+            50% { background-color: #f5c6cb; }
+            100% { background-color: #f8d7da; }
+        }
+
+        .process-blocks {
+            display: flex;
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .safe-block, .wait-block {
+            flex: 1;
+            padding: 20px;
+            border-radius: 12px;
+            min-height: 120px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .safe-block {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: none;
+        }
+
+        .wait-block {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border: none;
+        }
+
+        .execution-log {
+            margin-top: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .execution-log p {
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+
+        .cell-safe {
+            background-color: #d4edda;
+            animation: safePulse 2s infinite;
+        }
+        
+        .cell-wait {
+            background-color: #f8d7da;
+            animation: waitPulse 2s infinite;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Interactive Banker's Algorithm Simulator</h1>
+    
+    <div class="setup-section">
+        <h2>System Configuration</h2>
+        <div>
+            <label>Number of Processes: 
+                <input type="number" id="processCount" min="1" max="10" value="3">
+            </label>
+            <label style="margin-left: 20px;">Number of Resources: 
+                <input type="number" id="resourceCount" min="1" max="5" value="3">
+            </label>
+            <button class="btn" onclick="initializeSystem()">Initialize System</button>
+        </div>
+    </div>
+
+    <div id="matricesContainer" style="display:none;">
+        <div class="container">
+            <div class="matrix-section">
+                <h3>Initial Resources</h3>
+                <table id="initialResourcesTable"></table>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="matrix-section">
+                <h3>Maximum Matrix</h3>
+                <table id="maximumMatrixTable"></table>
+            </div>
+
+            <div class="matrix-section">
+                <h3>Allocation Matrix</h3>
+                <table id="allocationMatrixTable"></table>
+            </div>
+        </div>
+
+        <button class="btn" onclick="calculateNeedMatrix()">Calculate Need Matrix</button>
+
+        <div class="container">
+            <div class="matrix-section">
+                <h3>Need Matrix</h3>
+                <table id="needMatrixTable"></table>
+            </div>
+
+            <div class="matrix-section">
+                <h3>Available Resources</h3>
+                <table id="availableResourcesTable"></table>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn" id="startExecutionBtn" style="display: none;" onclick="startAutomaticExecution()">
+                Start Execution
+            </button>
+        </div>
+
+        <div class="process-blocks">
+            <div class="safe-block">
+                <h3>Safe Processes</h3>
+                <div id="safeProcesses"></div>
+            </div>
+            <div class="wait-block">
+                <h3>Waiting Processes</h3>
+                <div id="waitingProcesses"></div>
+            </div>
+        </div>
+
+        <div class="execution-log">
+            <h3>Execution Log</h3>
+            <div id="executionLog"></div>
+        </div>
+
+        <div id="executionStatus"></div>
+    </div>
+
+    <script>
+        let processCount, resourceCount;
+        let initialResources, maximumMatrix, allocationMatrix;
+        let needMatrix, availableResources;
+        let safeSequence = [];
+        let executedProcesses = new Set();
+        let waitingProcesses = new Set();
+
+        function initializeSystem() {
+            processCount = parseInt(document.getElementById('processCount').value);
+            resourceCount = parseInt(document.getElementById('resourceCount').value);
+
+            // Initialize Initial Resources Table
+            const initialResourcesTable = document.getElementById('initialResourcesTable');
+            initialResourcesTable.innerHTML = '<tr>' + 
+                Array.from({length: resourceCount}, (_, j) => 
+                    `<th>Resource ${j+1}</th>`
+                ).join('') + '</tr><tr>' +
+                Array.from({length: resourceCount}, () => 
+                    `<td><input type="number" min="0" value="0"></td>`
+                ).join('') + '</tr>';
+
+            // Initialize Maximum Matrix
+            const maximumMatrixTable = document.getElementById('maximumMatrixTable');
+            maximumMatrixTable.innerHTML = '<tr><th>Process</th>' + 
+                Array.from({length: resourceCount}, (_, j) => 
+                    `<th>Resource ${j+1}</th>`
+                ).join('') + '</tr>' +
+                Array.from({length: processCount}, (_, i) => 
+                    `<tr><td>P${i}</td>` +
+                    Array.from({length: resourceCount}, () => 
+                        `<td><input type="number" min="0" value="0"></td>`
+                    ).join('') + '</tr>'
+                ).join('');
+
+            // Initialize Allocation Matrix
+            const allocationMatrixTable = document.getElementById('allocationMatrixTable');
+            allocationMatrixTable.innerHTML = '<tr><th>Process</th>' + 
+                Array.from({length: resourceCount}, (_, j) => 
+                    `<th>Resource ${j+1}</th>`
+                ).join('') + '</tr>' +
+                Array.from({length: processCount}, (_, i) => 
+                    `<tr><td>P${i}</td>` +
+                    Array.from({length: resourceCount}, () => 
+                        `<td><input type="number" min="0" value="0"></td>`
+                    ).join('') + '</tr>'
+                ).join('');
+
+            document.getElementById('matricesContainer').style.display = 'block';
+            
+            // Don't initialize waiting processes here
+            executedProcesses.clear();
+            waitingProcesses.clear();
+            safeSequence = [];
+            updateProcessBlocks();
+        }
+
+        function calculateNeedMatrix() {
+            // Collect matrices data
+            initialResources = Array.from(
+                document.querySelectorAll('#initialResourcesTable input')
+            ).map(input => parseInt(input.value));
+
+            maximumMatrix = Array.from(
+                document.querySelectorAll('#maximumMatrixTable tr:not(:first-child)')
+            ).map(row => 
+                Array.from(row.querySelectorAll('input')).map(input => parseInt(input.value))
+            );
+
+            allocationMatrix = Array.from(
+                document.querySelectorAll('#allocationMatrixTable tr:not(:first-child)')
+            ).map(row => 
+                Array.from(row.querySelectorAll('input')).map(input => parseInt(input.value))
+            );
+
+            // Calculate Need Matrix
+            needMatrix = maximumMatrix.map((row, i) => 
+                row.map((max, j) => max - allocationMatrix[i][j])
+            );
+
+            // Calculate Available Resources correctly
+            availableResources = initialResources.map((total, j) => {
+                const allocated = allocationMatrix.reduce((sum, row) => sum + row[j], 0);
+                return total - allocated;
+            });
+
+            // Display matrices
+            displayNeedMatrix();
+            displayAvailableResources();
+            checkSafeCells(); // Just clear any existing highlighting
+            
+            // Show the Start Execution button
+            document.getElementById('startExecutionBtn').style.display = 'inline-block';
+            
+            // Clear previous execution state
+            executedProcesses.clear();
+            waitingProcesses.clear();
+            safeSequence = [];
+            updateProcessBlocks();
+            
+            // Clear execution log
+            document.getElementById('executionLog').innerHTML = '';
+        }
+
+        function displayNeedMatrix() {
+            const needMatrixTable = document.getElementById('needMatrixTable');
+            needMatrixTable.innerHTML = '<tr><th>Process</th>' + 
+                Array.from({length: resourceCount}, (_, j) => 
+                    `<th>Resource ${j+1}</th>`
+                ).join('') + '</tr>' +
+                needMatrix.map((row, i) => 
+                    `<tr><td>P${i}</td>` +
+                    row.map((need, j) => 
+                        `<td class="need-cell" data-process="${i}" data-resource="${j}">${need}</td>`
+                    ).join('') + '</tr>'
+                ).join('');
+            
+            checkSafeCells();
+        }
+
+        function checkSafeCells() {
+            // Clear all previous highlighting
+            const needCells = document.querySelectorAll('.need-cell');
+            needCells.forEach(cell => {
+                cell.classList.remove('cell-safe', 'cell-wait');
+            });
+        }
+
+        function displayAvailableResources() {
+            const availableResourcesTable = document.getElementById('availableResourcesTable');
+            availableResourcesTable.innerHTML = '<tr>' + 
+                Array.from({length: resourceCount}, (_, j) => 
+                    `<th>Resource ${j+1}</th>`
+                ).join('') + '</tr><tr>' +
+                availableResources.map(res => `<td>${res}</td>`).join('') + '</tr>';
+        }
+
+        function startAutomaticExecution() {
+            // Disable the button during execution
+            document.getElementById('startExecutionBtn').disabled = true;
+            document.getElementById('startExecutionBtn').textContent = 'Execution in Progress...';
+            
+            // Start execution from P0
+            executeProcessesAutomatically(0).then(() => {
+                // Re-enable the button after execution is complete
+                document.getElementById('startExecutionBtn').disabled = false;
+                document.getElementById('startExecutionBtn').textContent = 'Start Execution';
+            });
+        }
+
+        async function executeProcessesAutomatically(currentProcess) {
+            if (currentProcess >= processCount) {
+                // Check if there are any processes still waiting
+                if (waitingProcesses.size > 0) {
+                    logExecution('DEADLOCK DETECTED: Following processes cannot be executed: ' + 
+                        Array.from(waitingProcesses).map(p => 'P' + p).join(', '));
+                    highlightAllCellsRed();
+                    document.getElementById('startExecutionBtn').textContent = 'Execution Complete (Deadlock)';
+                    return;
+                } else {
+                    logExecution(`Execution Complete! Safe Sequence: ${safeSequence.map(p => 'P' + p).join(' → ')}`);
+                    document.getElementById('startExecutionBtn').textContent = 'Execution Complete';
+                }
+                return;
+            }
+
+            // First, check waiting processes
+            await checkWaitingProcesses();
+
+            // Then try to execute current process
+            const row = document.querySelector(`#needMatrixTable tr:nth-child(${currentProcess + 2})`);
+            const cells = row.querySelectorAll('.need-cell');
+            
+            // Highlight cells based on resource availability
+            cells.forEach((cell, j) => {
+                const need = needMatrix[currentProcess][j];
+                if (need <= availableResources[j]) {
+                    cell.classList.add('cell-safe');
+                    cell.classList.remove('cell-wait');
+                } else {
+                    cell.classList.add('cell-wait');
+                    cell.classList.remove('cell-safe');
+                }
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            // Check if process can be executed
+            const canExecute = needMatrix[currentProcess].every((need, j) => need <= availableResources[j]);
+
+            if (canExecute) {
+                // Execute process
+                executedProcesses.add(currentProcess);
+                safeSequence.push(currentProcess);
+
+                // Release resources
+                allocationMatrix[currentProcess].forEach((allocated, j) => {
+                    availableResources[j] += allocated;
+                });
+
+                logExecution(currentProcess);
+                displayAvailableResources();
+                updateProcessBlocks();
+                
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            } else {
+                // Only add to waiting if it can't be executed
+                waitingProcesses.add(currentProcess);
+                updateProcessBlocks();
+                logExecution(`Process P${currentProcess} must wait`);
+            }
+
+            // Move to next process
+            await executeProcessesAutomatically(currentProcess + 1);
+        }
+
+        async function checkWaitingProcesses() {
+            let executedWaiting = false;
+            
+            do {
+                executedWaiting = false;
+                for (let waitingProcess of waitingProcesses) {
+                    const canExecute = needMatrix[waitingProcess].every((need, j) => need <= availableResources[j]);
+                    
+                    if (canExecute) {
+                        // Highlight cells before execution
+                        const row = document.querySelector(`#needMatrixTable tr:nth-child(${waitingProcess + 2})`);
+                        const cells = row.querySelectorAll('.need-cell');
+                        cells.forEach(cell => {
+                            cell.classList.add('cell-safe');
+                            cell.classList.remove('cell-wait');
+                        });
+
+                        // Increased delay to 3 seconds
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+
+                        // Execute waiting process
+                        executedProcesses.add(waitingProcess);
+                        waitingProcesses.delete(waitingProcess);
+                        safeSequence.push(waitingProcess);
+
+                        // Release resources
+                        allocationMatrix[waitingProcess].forEach((allocated, j) => {
+                            availableResources[j] += allocated;
+                        });
+
+                        logExecution(`Waiting process P${waitingProcess} now executed`);
+                        displayAvailableResources();
+                        updateProcessBlocks();
+                        
+                        executedWaiting = true;
+                        // Increased delay to 3 seconds
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                        break;
+                    }
+                }
+            } while (executedWaiting && waitingProcesses.size > 0);
+        }
+
+        // Add this new function for deadlock visualization
+        function highlightAllCellsRed() {
+            const allCells = document.querySelectorAll('.need-cell');
+            allCells.forEach(cell => {
+                cell.classList.add('cell-wait');
+                cell.classList.remove('cell-safe');
+            });
+        }
+
+        // Update the log function to make deadlock messages more informative
+        function logExecution(message) {
+            const log = document.getElementById('executionLog');
+            const logEntry = document.createElement('p');
+            
+            if (typeof message === 'number') {
+                logEntry.innerHTML = `Executed P${message}. Available Resources: [${availableResources.join(', ')}]`;
+            } else {
+                if (message.includes('DEADLOCK')) {
+                    logEntry.style.color = 'red';
+                    logEntry.style.fontWeight = 'bold';
+                    logEntry.style.backgroundColor = '#ffe6e6'; // Light red background
+                    logEntry.style.padding = '10px';
+                    logEntry.style.borderRadius = '5px';
+                }
+                logEntry.innerHTML = message;
+            }
+            
+            logEntry.style.animation = 'slideIn 0.5s ease';
+            log.insertBefore(logEntry, log.firstChild);
+        }
+
+        function updateProcessBlocks() {
+            document.getElementById('safeProcesses').innerHTML = 
+                Array.from(executedProcesses).map(i => `P${i}`).join(' → ') || 'None';
+            document.getElementById('waitingProcesses').innerHTML = 
+                Array.from(waitingProcesses).map(i => `P${i}`).join(', ') || 'None';
+        }
+    </script>
+</body>
+</html>
