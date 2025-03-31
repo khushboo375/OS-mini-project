@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Banker's Algorithm Dashboard</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .image-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .image-container img {
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            padding: 12px 25px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+    <h1>Banker's Algorithm Dashboard</h1>
+    
+    <div class="section">
+        <h2>What is Banker's Algorithm?</h2>
+        <p>The Banker's Algorithm is a resource allocation and deadlock avoidance algorithm used in operating systems to prevent resource deadlocks. It determines whether granting a resource request will keep the system in a safe state.</p>
+        <p>The algorithm operates by simulating resource allocation and ensuring that at least one sequence of process execution is possible without leading to a deadlock.</p>
+<!--         <div class="image-container">
+            <img src="bankers_algorithm.png" alt="Banker's Algorithm Illustration">
+        </div> -->
+    </div>
+    
+    <div class="section">
+        <h2>Data Structures in Banker's Algorithm</h2>
+        <p>The Banker's Algorithm maintains a set of data using which it decides whether to entertain the request of any process or not. It follows the safety algorithm to check whether the system is in a safe state.</p>
+        <ul>
+            <li><strong>Available Resources Array:</strong> Stores the current number of available resources of each type.</li>
+            <li><strong>Maximum Matrix:</strong> Stores the maximum number of resources each process may require.</li>
+            <li><strong>Allocation Matrix:</strong> Stores the number of resources currently allocated to each process.</li>
+            <li><strong>Need Matrix:</strong> Stores the remaining resources required by each process (calculated as Maximum - Allocation).</li>
+        </ul>
+<!--         <div class="image-container">
+            <img src="data_structures.png" alt="Data Structures in Banker's Algorithm">
+        </div> -->
+    </div>
+    
+    <div class="section">
+        <h2>What is Deadlock?</h2>
+        <p>Deadlock is a state in which a set of processes are blocked because each process is holding a resource and waiting for another resource acquired by another process.</p>
+        <p>Conditions for Deadlock:</p>
+        <ul>
+            <li><strong>Mutual Exclusion</strong> - Only one process can use a resource at a time.</li>
+            <li><strong>Hold and Wait</strong> - A process holding a resource can request additional resources.</li>
+            <li><strong>No Preemption</strong> - A resource cannot be forcibly taken away from a process.</li>
+            <li><strong>Circular Wait</strong> - A cycle exists where processes are waiting on each other.</li>
+        </ul>
+        <p>To avoid deadlocks, operating systems use algorithms like the Banker's Algorithm, resource ordering, or timeout-based handling mechanisms.</p>
+<!--         <div class="image-container">
+            <img src="deadlock_conditions.png" alt="Deadlock Conditions Illustration">
+        </div> -->
+    </div>
+    
+    <div class="section">
+        <h2>How the Banker's Algorithm Simulator Works</h2>
+        <p>The simulator allows users to configure the number of processes and resources, input their current resource allocations and maximum demands, and then run the algorithm to check if the system is in a safe state.</p>
+        <p>The algorithm works by verifying whether a safe sequence exists—if it does, the system can avoid deadlock. If not, the request may be denied to maintain stability.</p>
+<!--         <div class="image-container">
+            <img src="simulator_working.png" alt="Banker's Algorithm Simulator Working">
+        </div> -->
+    </div>
+    
+    <a href="bankers_simulator.html" class="btn">Go to Banker's Algorithm Simulator</a>
+</body>
+</html>
