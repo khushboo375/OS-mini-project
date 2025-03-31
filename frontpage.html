@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Banker's Algorithm Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banker's Algorithm</title>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -13,12 +14,15 @@
             min-height: 100vh;
         }
 
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
+
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 2.5em;
+            margin-bottom: 40px;
+            font-size: 3em;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Roboto', sans-serif; /* Updated font */
         }
 
         .section {
@@ -39,6 +43,7 @@
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
             margin-bottom: 20px;
+            font-size: 1.8em;
         }
 
         p {
@@ -47,14 +52,60 @@
             color: #2c3e50;
         }
 
+        .highlight-term {
+            color: #3498db;
+            text-decoration: underline;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            margin-right: 20px; /* space between terms */
+        }
+
+        /* Adjust the layout of the popups */
+        .popup-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px; /* spacing between each popup */
+            margin-top: 8px;
+        }
+
+        .popup {
+            visibility: hidden;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background-color: #ffffff;
+            padding: 11px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            z-index: 10;
+            opacity: 0;
+            transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        .highlight-term:hover .popup {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .popup img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+
+        .popup-content {
+            font-size: 1em;
+        }
+
         .image-container {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 30px;
         }
 
         .image-container img {
-            width: 80%;
-            max-width: 600px;
+            width: 100%;
+            max-width: 700px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
@@ -62,7 +113,7 @@
         .btn {
             display: block;
             width: fit-content;
-            margin: 20px auto;
+            margin: 40px auto;
             padding: 12px 25px;
             border-radius: 8px;
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
@@ -78,59 +129,166 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 8px rgba(0,0,0,0.15);
         }
+
+        /* For mobile responsiveness */
+        @media (max-width: 768px) {
+            .section {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .popup {
+                width: 250px;
+            }
+
+            .image-container img {
+                width: 90%;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Banker's Algorithm Dashboard</h1>
-    
+    <h1>Banker's Algorithm</h1>
+
+    <!-- Section 1: What is Banker's Algorithm -->
     <div class="section">
         <h2>What is Banker's Algorithm?</h2>
-        <p>The Banker's Algorithm is a resource allocation and deadlock avoidance algorithm used in operating systems to prevent resource deadlocks. It determines whether granting a resource request will keep the system in a safe state.</p>
+            <div class="popup">
+                <div class="popup-content">
+                    <h3>Banker's Algorithm</h3>
+                    <p>The Banker's Algorithm is used to check the safety of resource allocation and prevent deadlocks in operating systems.</p>
+                    <img src="bankers_algorithm_overview.png" alt="Banker's Algorithm Overview">
+                </div>
+            </div>
+        </span></span>The Banker's Algorithm is a resource allocation and deadlock avoidance algorithm used in operating systems to prevent resource deadlocks. It determines whether granting a resource request will keep the system in a safe state.</p>
         <p>The algorithm operates by simulating resource allocation and ensuring that at least one sequence of process execution is possible without leading to a deadlock.</p>
-<!--         <div class="image-container">
-            <img src="bankers_algorithm.png" alt="Banker's Algorithm Illustration">
-        </div> -->
+        <div class="image-container">
+            <img src="flowchart.png" alt="Banker's Algorithm Flowchart">
+        </div>
     </div>
-    
+
+    <!-- Section 2: Data Structures -->
     <div class="section">
         <h2>Data Structures in Banker's Algorithm</h2>
-        <p>The Banker's Algorithm maintains a set of data using which it decides whether to entertain the request of any process or not. It follows the safety algorithm to check whether the system is in a safe state.</p>
+        <p>The Banker's Algorithm maintains a set of data structures to decide whether to grant a resource request or not. Below are the key components:</p>
+        <div class="image-container">
+            <img src="datastructure.png" alt="Banker's Algorithm Data Structures">
+        </div>
         <ul>
-            <li><strong>Available Resources Array:</strong> Stores the current number of available resources of each type.</li>
-            <li><strong>Maximum Matrix:</strong> Stores the maximum number of resources each process may require.</li>
-            <li><strong>Allocation Matrix:</strong> Stores the number of resources currently allocated to each process.</li>
-            <li><strong>Need Matrix:</strong> Stores the remaining resources required by each process (calculated as Maximum - Allocation).</li>
+            <li><span class="highlight-term">Available Resources Array
+                <div class="popup-container">
+                    <div class="popup">
+                        <div class="popup-content">
+                            <h3>Available Resources Array</h3>
+                            <p><b>Definition:</b> The "Available Resources Array" is a collection that tracks the number of available instances for each resource type in the system. It tells the Banker's Algorithm how many resources are currently free and can be allocated to processes.</p>
+                            <p><b>Purpose:</b> It helps in determining if a resource request can be granted by comparing the requested resources with the available resources.</p>
+                        </div>
+                    </div>
+                </div>
+            </span></li>
+            <li><span class="highlight-term">Maximum Matrix
+                <div class="popup-container">
+                    <div class="popup">
+                        <div class="popup-content">
+                            <h3>Maximum Matrix</h3>
+                            <p><b>Definition:</b> The "Maximum Matrix" defines the maximum demand for each resource by each process. It shows the highest number of resources a process may need to complete its execution.</p>
+                            <p><b>Purpose:</b>It is used to ensure that the system never allocates more resources to a process than it needs, helping to avoid deadlocks.</p>
+                        </div>
+                    </div>
+                </div>
+            </span></li>
+            <li><span class="highlight-term">Allocation Matrix
+                <div class="popup-container">
+                    <div class="popup">
+                        <div class="popup-content">
+                            <h3>Allocation Matrix</h3>
+                            <p><b>Definition:</b> The "Allocation Matrix" holds the number of instances of each resource type that are currently allocated to each process.</p>
+                            <p><b>Purpose:</b> It is used to track the current usage of resources by each process and is required to calculate the "Need Matrix."</p>
+                        </div>
+                    </div>
+                </div>
+            </span></li>
+            <li><span class="highlight-term">Need Matrix
+                <div class="popup-container">
+                    <div class="popup">
+                        <div class="popup-content">
+                            <h3>Need Matrix</h3>
+                            <p><b>Definition:</b> The "Need Matrix" is calculated by subtracting the "Allocation Matrix" from the "Maximum Matrix." It shows the remaining resources each process requires to complete its execution.</p>
+                            <p><b>Purpose: </b>It helps the Banker's Algorithm determine if a process can finish with the current available resources, and whether granting a request would leave the system in a safe state.</p>
+                        </div>
+                    </div>
+                </div>
+            </span></li>
         </ul>
-<!--         <div class="image-container">
-            <img src="data_structures.png" alt="Data Structures in Banker's Algorithm">
-        </div> -->
     </div>
-    
+
+    <!-- Section 3: What is Deadlock -->
     <div class="section">
         <h2>What is Deadlock?</h2>
-        <p>Deadlock is a state in which a set of processes are blocked because each process is holding a resource and waiting for another resource acquired by another process.</p>
-        <p>Conditions for Deadlock:</p>
+        <p>Deadlock is a state in which a set of processes are blocked because each process is holding a resource and waiting for another resource acquired by another process. </p>
+        <div class="image-container">
+            <img src="deadlock.webp" alt="Deadlock Conditions">
+        </div>
+        <p>The conditions for deadlock are:</p>
         <ul>
-            <li><strong>Mutual Exclusion</strong> - Only one process can use a resource at a time.</li>
-            <li><strong>Hold and Wait</strong> - A process holding a resource can request additional resources.</li>
-            <li><strong>No Preemption</strong> - A resource cannot be forcibly taken away from a process.</li>
-            <li><strong>Circular Wait</strong> - A cycle exists where processes are waiting on each other.</li>
+            <li><span class="highlight-term">Mutual Exclusion
+                <div class="popup-container">
+                    <div class="popup">
+                        <div class="popup-content">
+                            <h3>Mutual Exclusion</h3>
+                            <p><b>Definition: </b>The Mutual Exclusion condition implies that a resource can only be held by one process at a time. No two processes can share the same resource simultaneously. If a process is holding a resource, no other process can access it until it is released.</p>
+                            <p><b>Importance in Deadlock: </b>This condition is necessary for deadlock to occur because if resources were shared, deadlock could not happen. Each resource must be exclusive to a single process.</p>
+                        </div>
+                    </div>
+                </div>
+            </span></li>
+            <li><span class="highlight-term">Hold and Wait
+                <div class="popup-container">
+                    <div class="popup">
+                        <div class="popup-content">
+                            <h3>Hold and Wait</h3>
+                            <p><b>Definition:</b> The Hold and Wait condition occurs when a process is holding one or more resources and is waiting to acquire additional resources that are currently held by other processes.</p>
+                            <p><b>Importance in Deadlock:</b> This condition creates a situation where a process may hold a resource and block others from obtaining the resources they need to complete their tasks, potentially leading to a circular wait, which is a necessary condition for deadlock.</p>
+                        </div>
+                    </div>
+                </div>
+            </span></li>
+            <li><span class="highlight-term">No Preemption
+                <div class="popup-container">
+                    <div class="popup">
+                        <div class="popup-content">
+                            <h3>No Preemption</h3>
+                            <p><b>Definition: </b>The No Preemption condition states that once a process has been allocated a resource, the operating system cannot forcibly take it away from the process, even if other processes are waiting for that resource.</p>
+                            <p><b>Importance in Deadlock:</b>If resources cannot be preempted, it becomes possible for processes to hold resources indefinitely while waiting for other resources, causing a potential deadlock situation.</p>
+                        </div>
+                    </div>
+                </div>
+            </span></li>
+            <li><span class="highlight-term">Circular Wait
+                <div class="popup-container">
+                    <div class="popup">
+                        <div class="popup-content">
+                            <h3>Circular Wait</h3>
+                            <p><b>Definition: </b>The Circular Wait condition exists when a set of processes are each waiting for a resource that is held by another process in the set, forming a circular chain of waiting processes. Each process in the circle is waiting for a resource held by the next process, creating a deadlock.</p>
+                            <p><b>Importance in Deadlock: </b>This condition is the final piece that completes the deadlock scenario. If a circular wait exists, deadlock is inevitable because each process is blocked and unable to release the resources it holds to resolve the wait.</p>
+                        </div>
+                    </div>
+                </div>
+            </span></li>
         </ul>
         <p>To avoid deadlocks, operating systems use algorithms like the Banker's Algorithm, resource ordering, or timeout-based handling mechanisms.</p>
-<!--         <div class="image-container">
-            <img src="deadlock_conditions.png" alt="Deadlock Conditions Illustration">
-        </div> -->
     </div>
-    
+
+    <!-- Section 4: How the Simulator Works -->
     <div class="section">
         <h2>How the Banker's Algorithm Simulator Works</h2>
-        <p>The simulator allows users to configure the number of processes and resources, input their current resource allocations and maximum demands, and then run the algorithm to check if the system is in a safe state.</p>
-        <p>The algorithm works by verifying whether a safe sequence exists—if it does, the system can avoid deadlock. If not, the request may be denied to maintain stability.</p>
-<!--         <div class="image-container">
-            <img src="simulator_working.png" alt="Banker's Algorithm Simulator Working">
-        </div> -->
+        <p>The Banker's Algorithm Simulator helps visualize how processes and resources interact to avoid deadlock. After entering the number of processes and resources, the simulator generates resource matrices and calculates the Need Matrix and Available Resources. It checks if processes can safely execute based on available resources, marking them as safe or waiting. If at least one of the process is in waiting state for infinite time it means there is a deadlock.. The simulation tracks progress through an execution log, using color-coded visuals to indicate safe or waiting processes, demonstrating how the Banker's Algorithm ensures deadlock-free execution.</p>
     </div>
-    
-    <a href="bankers_simulator.html" class="btn">Go to Banker's Algorithm Simulator</a>
+
+    <!-- Button to Go to the Simulator -->
+    <a href="index.html" class="btn">Go to Banker's Algorithm Simulator</a>
 </body>
 </html>
